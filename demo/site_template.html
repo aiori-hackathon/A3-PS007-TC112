@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VEIL6 — Privacy-Aware IPv6 IoT Security Monitoring</title>
+<meta name="description" content="VEIL6 detects attacks on IPv6 IoT devices even while privacy addresses rotate, without storing a single raw IP or MAC. AIORI-3 PS-007, Team CIPHER NEST.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0b1f3a; --navy2:#13305a; --brand:#1d4ed8; --teal:#0f9d8a; --teal-bg:#e7f6f3;
+    --ink:#0f172a; --body:#334155; --mute:#64748b; --line:#e2e8f0; --soft:#f8fafc; --soft2:#f1f5f9;
+    --crit:#dc2626; --high:#ea580c; --med:#ca8a04;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#fff;color:var(--body);font:16px/1.65 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .mono,code{font-family:"JetBrains Mono",ui-monospace,monospace}
+  code{font-size:.88em;background:var(--soft2);padding:1px 6px;border-radius:4px;color:var(--navy2)}
+  a{color:inherit}
+  h1,h2,h3{color:var(--ink);letter-spacing:-.02em}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:800;font-size:20px;letter-spacing:-.02em}
+  .brand .mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--navy),var(--brand));display:grid;place-items:center}
+  .brand small{display:block;font-size:11px;font-weight:500;color:var(--mute);letter-spacing:0;margin-top:-3px}
+  nav .links{display:flex;gap:28px;align-items:center;font-size:14.5px;font-weight:500}
+  nav .links a{text-decoration:none;color:var(--body)}
+  nav .links a:hover{color:var(--brand)}
+  @media(max-width:860px){nav .links a:not(.btn){display:none}}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff!important;font-weight:600;font-size:15px;padding:11px 20px;border-radius:8px;text-decoration:none;box-shadow:0 1px 2px rgba(15,23,42,.1);transition:background .2s}
+  .btn:hover{background:#1e40af}
+  .btn.sec{background:#fff;color:var(--ink)!important;border:1px solid var(--line)}
+  .btn.sec:hover{background:var(--soft)}
+  .btn.sm{padding:8px 16px;font-size:14px}
+
+  /* hero */
+  .hero{background:radial-gradient(1200px 500px at 85% -10%,#dbeafe 0,transparent 60%),radial-gradient(800px 400px at -10% 110%,#ccfbf1 0,transparent 60%),#fff;border-bottom:1px solid var(--line)}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center;padding-top:84px;padding-bottom:84px}
+  @media(max-width:960px){.hero .wrap{grid-template-columns:1fr;padding-top:56px}}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--navy2);background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 8px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+  .pill b{background:var(--teal-bg);color:var(--teal);border-radius:999px;padding:2px 8px;font-size:11.5px}
+  h1{font-size:clamp(36px,5.2vw,58px);line-height:1.08;margin:22px 0 20px;font-weight:800}
+  h1 .accent{background:linear-gradient(90deg,var(--brand),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{font-size:19px;color:var(--body);max-width:600px;margin:0}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+  .trust{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:12px 32px;margin-top:40px;padding-top:24px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mute)}
+  @media(max-width:600px){.trust{grid-template-columns:1fr 1fr}}
+  .trust div b{display:block;color:var(--ink);font-size:20px;font-weight:700}
+
+  /* product window */
+  .window{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 60px -20px rgba(15,23,42,.25),0 0 0 1px rgba(15,23,42,.02)}
+  .window .bar{display:flex;align-items:center;gap:7px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--soft)}
+  .window .bar i{width:10px;height:10px;border-radius:50%;background:#e2e8f0;display:block}
+  .window .bar span{margin-left:10px;font-size:12.5px;color:var(--mute);font-weight:500}
+  .window .body{padding:20px}
+  .wlabel{font-size:11.5px;font-weight:600;color:var(--mute);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;justify-content:space-between}
+  .addrs{display:flex;flex-direction:column;gap:6px;min-height:170px}
+  .addr{font-family:"JetBrains Mono";font-size:12.5px;padding:8px 12px;border-radius:7px;background:var(--soft);border:1px solid var(--line);color:var(--mute);display:flex;justify-content:space-between;transition:all .4s}
+  .addr.new{background:#eff6ff;border-color:#bfdbfe;color:var(--navy2);animation:pop .45s ease}
+  .addr em{font-style:normal;font-family:Inter;font-size:11px;font-weight:600;color:var(--brand)}
+  @keyframes pop{from{opacity:0;transform:translateY(-6px)}}
+  .flowto{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:12px;color:var(--mute)}
+  .flowto::before,.flowto::after{content:"";flex:1;height:1px;background:var(--line)}
+  .sess{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:10px;background:var(--teal-bg);border:1px solid #a7e3d8}
+  .sess .id{font-family:"JetBrains Mono";font-size:16px;font-weight:500;color:#0b6e61}
+  .sess .ok{font-size:12px;font-weight:600;color:var(--teal)}
+  .alertrow{margin-top:14px;display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid #fecaca;background:#fef2f2;border-radius:8px;font-size:13px;color:#7f1d1d}
+  .alertrow b{color:var(--crit);font-family:"JetBrains Mono";font-size:12px}
+
+  /* sections */
+  section{padding:96px 0}
+  section.alt{background:var(--soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .kicker{font-size:13px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+  h2{font-size:clamp(28px,3.4vw,40px);line-height:1.15;margin:0 0 16px;font-weight:800}
+  .head{max-width:720px;margin-bottom:48px}
+  .head p{font-size:18px;margin:0}
+  .grid{display:grid;gap:20px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:960px){.g3,.g4{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+  @media(max-width:600px){.g3,.g4{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:26px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .card h3{font-size:18px;margin:14px 0 8px;font-weight:700}
+  .card p{margin:0;font-size:15px;color:var(--body)}
+  .icon{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:#eff6ff;color:var(--brand)}
+  .icon.red{background:#fef2f2;color:var(--crit)} .icon.teal{background:var(--teal-bg);color:var(--teal)}
+  .card.feature{border-top:3px solid var(--teal)}
+
+  /* pipeline */
+  .arch-wrap{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px;overflow-x:auto}
+  .arch{width:100%;min-width:760px;height:auto;display:block}
+  .steps .num{font-family:"JetBrains Mono";font-size:12.5px;font-weight:500;color:var(--brand);background:#eff6ff;border-radius:6px;padding:3px 8px;display:inline-block}
+
+  /* rules */
+  .rule{padding:22px}
+  .rule .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .rule .name{font-family:"JetBrains Mono";font-weight:500;font-size:13.5px;color:var(--ink)}
+  .sev{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 9px;border-radius:999px}
+  .sev.critical{background:#fef2f2;color:var(--crit)} .sev.high{background:#fff7ed;color:var(--high)} .sev.medium{background:#fefce8;color:var(--med)}
+  .rule p{margin:12px 0 0;font-size:14.5px}
+  .rule .sig{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:13px;color:var(--mute)}
+  .rule .mitre{display:inline-block;margin-top:6px;font-family:"JetBrains Mono";font-size:11.5px;color:var(--navy2);background:var(--soft2);border-radius:5px;padding:2px 7px}
+
+  /* stats band */
+  .band{background:linear-gradient(135deg,var(--navy) 0,var(--navy2) 100%);color:#cbd5e1}
+  .band h2,.band .kicker{color:#fff}
+  .band .kicker{color:#5eead4}
+  .band .head p{color:#cbd5e1}
+  .stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:24px}
+  .stat .v{font-size:38px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.1}
+  .stat .l{font-size:14px;color:#94a3b8;margin-top:6px}
+  .band .note{margin-top:28px;font-size:14px;color:#94a3b8;max-width:860px;padding:14px 18px;border-left:3px solid #5eead4;background:rgba(255,255,255,.04);border-radius:0 8px 8px 0}
+  .band code{background:rgba(255,255,255,.1);color:#e2e8f0}
+
+  /* privacy */
+  .checks{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+  .checks li{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .checks li svg{flex:none;margin-top:2px}
+  .checks b{display:block;color:var(--ink);font-size:15.5px;margin-bottom:2px}
+  .checks span{font-size:14.5px}
+
+  /* cta band */
+  .ctab{background:#fff;border:1px solid var(--line);border-radius:16px;padding:48px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;box-shadow:0 20px 40px -24px rgba(15,23,42,.2);background-image:radial-gradient(600px 200px at 100% 0,#dbeafe 0,transparent 70%)}
+  .ctab h2{margin:0 0 8px}
+  .ctab p{margin:0;font-size:17px}
+
+  /* team */
+  .person{display:flex;gap:16px;align-items:center}
+  .avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--navy2),var(--brand));flex:none}
+  .avatar.t{background:linear-gradient(135deg,#0b6e61,var(--teal))}
+  .person h3{margin:0;font-size:17px}
+  .person .r{font-size:13px;font-weight:600;color:var(--brand)}
+  .person + p{margin-top:14px!important}
+
+  footer{background:var(--navy);color:#94a3b8;padding:48px 0 36px;font-size:14px}
+  footer .wrap{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px}
+  @media(max-width:760px){footer .wrap{grid-template-columns:1fr}}
+  footer h4{color:#fff;margin:0 0 12px;font-size:14px}
+  footer a{display:block;color:#cbd5e1;text-decoration:none;margin-bottom:6px}
+  footer a:hover{color:#fff}
+  footer .fine{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.1);padding-top:20px;font-size:12.5px}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="#top" class="brand">
+    <span class="mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+    <span>VEIL6<small>IPv6 IoT Security</small></span>
+  </a>
+  <div class="links">
+    <a href="#problem">Problem</a><a href="#solution">Solution</a><a href="#detection">Detection</a>
+    <a href="#results">Results</a><a href="#team">Team</a>
+    <a href="demo.html" class="btn sm">Live demo</a>
+  </div>
+</div></nav>
+
+<header class="hero" id="top"><div class="wrap">
+  <div>
+    <span class="pill"><b>AIORI-3</b> Problem Statement PS-007 · Team CIPHER NEST</span>
+    <h1>Security monitoring for IPv6 IoT, <span class="accent">without tracking people.</span></h1>
+    <p class="lead">VEIL6 detects and attributes attacks on every IoT device, even while IPv6 privacy addresses keep rotating, and it never stores a raw IP or MAC address.</p>
+    <div class="cta">
+      <a class="btn" href="demo.html">Launch live demo
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn sec" href="__REPO__">View source on GitHub</a>
+    </div>
+    <div class="trust">
+      <div><b>8</b>attack classes</div>
+      <div><b>__N__</b>attacks benchmarked</div>
+      <div><b>0</b>raw identifiers stored</div>
+      <div><b>__LAT__s</b>mean detection time</div>
+    </div>
+  </div>
+
+  <div class="window" aria-label="Rotating IPv6 addresses mapped to one pseudonymous session">
+    <div class="bar"><i></i><i></i><i></i><span>VEIL6 · Session Mapper</span></div>
+    <div class="body">
+      <div class="wlabel"><span>cam-frontdoor · temporary addresses (RFC 8981)</span><span id="tick" class="mono">t=0s</span></div>
+      <div class="addrs" id="addrs"></div>
+      <div class="flowto">NDP binding → HMAC(K<sub>epoch</sub>, ·)</div>
+      <div class="sess"><span class="id">S-558920eb4ebd</span><span class="ok">● 1 stable session</span></div>
+      <div class="alertrow"><b>EXFIL</b> 5.0 MB to a never-seen host · attributed to session S-f263…</div>
+    </div>
+  </div>
+</div></header>
+
+<section id="problem"><div class="wrap">
+  <div class="head">
+    <div class="kicker">The challenge</div>
+    <h2>Privacy and security are pulling in opposite directions</h2>
+    <p>IPv6 privacy extensions protect users from tracking by rotating device addresses. That same rotation blinds traditional security monitoring.</p>
+  </div>
+  <div class="grid g3">
+    <div class="card">
+      <div class="icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg></div>
+      <h3>IP-based monitoring breaks</h3>
+      <p>Each rotation looks like a brand-new host. Per-device baselines reset, and a compromised device can dodge an IP block just by changing its address.</p>
+    </div>
+    <div class="card">
+      <div class="icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <h3>The usual fix creates tracking</h3>
+      <p>Logging MAC and IP pairs restores visibility, but it builds exactly the identity database the privacy extensions were designed to prevent.</p>
+    </div>
+    <div class="card feature">
+      <div class="icon teal"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <h3>VEIL6 delivers both</h3>
+      <p>VEIL6 links rotating addresses to a keyed pseudonymous session, then detects and attributes attacks to it. No raw identifier is ever written down.</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="alt" id="solution"><div class="wrap">
+  <div class="head">
+    <div class="kicker">How it works</div>
+    <h2>A six-stage, privacy-first pipeline</h2>
+    <p>Raw identifiers are converted to pseudonyms at the first point they're seen. Every stage after that works only with pseudonyms.</p>
+  </div>
+  <div class="arch-wrap">
+    <svg class="arch" viewBox="0 0 1100 175" role="img" aria-label="VEIL6 pipeline">
+      <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#94a3b8"/></marker></defs>
+      __ARCH__
+    </svg>
+  </div>
+  <div class="grid g3 steps" style="margin-top:24px">
+    <div class="card"><span class="num">01 · IoT Lab</span><h3>Virtual IPv6 devices</h3><p>The lab has cameras, smart locks, a thermostat, sensors, plugs, a hub and a phone on <code>2001:db8:a10e:1::/64</code>, using RFC 7217 stable addresses and RFC 8981 rotation.</p></div>
+    <div class="card"><span class="num">02 · Capture</span><h3>Metadata only</h3><p>The gateway reads flow headers only: addresses, ports, protocol, size and ICMPv6 type. It never reads payloads.</p></div>
+    <div class="card"><span class="num">03 · Session Mapper</span><h3>Pseudonymize at ingest</h3><p>NDP NS/NA/DAD bindings become <code>HMAC(K_epoch, MAC)</code> sessions. Table entries expire with the address lifetime.</p></div>
+    <div class="card"><span class="num">04 · Rule Engine</span><h3>Eight sliding-window rules</h3><p>Rules run per session, per target and per pair. A learned destination profile catches exfiltration to hosts the device has never contacted.</p></div>
+    <div class="card"><span class="num">05 · Alerts</span><h3>Pseudonymous &amp; MITRE-tagged</h3><p>Each alert carries the session, the target, the evidence and the ATT&amp;CK technique. That's enough for a SOC analyst to act on, with no personal identifier inside.</p></div>
+    <div class="card"><span class="num">06 · Evaluator</span><h3>Measured, not claimed</h3><p>Controlled attacks carry ground truth, so every run reports precision, recall, latency, attribution and a leak audit.</p></div>
+  </div>
+</div></section>
+
+<section id="detection"><div class="wrap">
+  <div class="head">
+    <div class="kicker">Detection coverage</div>
+    <h2>Eight IPv6 &amp; IoT attack classes</h2>
+    <p>Each rule's thresholds and its MITRE ATT&amp;CK mapping are listed on its card.</p>
+  </div>
+  <div class="grid g4">__RULES__</div>
+</div></section>
+
+<section class="band" id="results"><div class="wrap">
+  <div class="head">
+    <div class="kicker">Benchmark results</div>
+    <h2>Measured on the simulated IoT lab</h2>
+    <p>__BENCH_DESC__</p>
+  </div>
+  <div class="grid g4">__STATS__</div>
+  <div class="note">The traffic is synthetic and the thresholds were tuned on this lab, so these figures describe a controlled scenario rather than a production network. The next step is to replay real IPv6 IoT captures (pcap → flows) through the same <code>Detector.ingest()</code> interface.</div>
+</div></section>
+
+<section id="privacy"><div class="wrap grid g2" style="gap:56px;align-items:start">
+  <div>
+    <div class="kicker">Privacy by design</div>
+    <h2>What VEIL6 deliberately never keeps</h2>
+    <p style="font-size:18px">VEIL6 has no privacy setting to switch on. The architecture enforces it, and an automated audit verifies it on every run.</p>
+  </div>
+  <ul class="checks">__CHECKS__</ul>
+</div></section>
+
+<section class="alt" style="padding:72px 0"><div class="wrap">
+  <div class="ctab">
+    <div><h2>See VEIL6 in action</h2><p>Choose the attacks and the rotation speed. The real VEIL6 Python engine then runs live in your browser.</p></div>
+    <a class="btn" href="demo.html">Launch live demo
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</div></section>
+
+<section id="team"><div class="wrap">
+  <div class="head">
+    <div class="kicker">Team CIPHER NEST · A3-PS007-TC112</div>
+    <h2>The team behind VEIL6</h2>
+    <p>Karunya Institute of Technology and Sciences</p>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="person"><div class="avatar">SB</div><div><h3>Shajilin Benadict S</h3><div class="r">Security &amp; Evaluation Lead</div></div></div>
+      <p>Security rules, controlled attack testing, result evaluation, final demo.</p></div>
+    <div class="card"><div class="person"><div class="avatar">JV</div><div><h3>Jayakumar V</h3><div class="r">Network &amp; Lab Lead</div></div></div>
+      <p>IPv6 lab, virtual IoT devices, address rotation, session mapping.</p></div>
+    <div class="card"><div class="person"><div class="avatar t">BC</div><div><h3>Beulah Christalin Latha C</h3><div class="r">Faculty Mentor</div></div></div>
+      <p>Associate Professor, Karunya Institute of Technology and Sciences.</p></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div>
+    <div class="brand" style="color:#fff;margin-bottom:12px"><span class="mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg></span>VEIL6</div>
+    Privacy-aware IPv6 IoT security monitoring.<br>AIORI-3 · Problem Statement PS-007.
+  </div>
+  <div><h4>Project</h4><a href="demo.html">Live demo</a><a href="__REPO__">Source code</a><a href="#results">Results</a></div>
+  <div><h4>Sections</h4><a href="#problem">Problem</a><a href="#solution">Solution</a><a href="#team">Team</a></div>
+  <div class="fine">All addresses use the IPv6 documentation prefix 2001:db8::/32. Attacks are simulated inside the virtual lab only.</div>
+</div></footer>
+
+<script>
+(function(){
+  const box = document.getElementById("addrs"), tick = document.getElementById("tick");
+  const hex = () => Math.floor(Math.random()*65536).toString(16);
+  const mk = () => `2001:db8:a10e:1:${hex()}:${hex()}:${hex()}:${hex()}`;
+  let t = 0, list = [];
+  function step(){
+    list.unshift(mk()); list = list.slice(0,4); t += 180;
+    box.innerHTML = list.map((a,i)=>`<div class="addr ${i===0?'new':''}"><span>${a}</span>${i===0?'<em>NEW</em>':''}</div>`).join("");
+    tick.textContent = `t=${t}s`;
+  }
+  for (let i=0;i<4;i++) step();
+  setInterval(step, 2000);
+})();
+</script>
+</body>
+</html>
